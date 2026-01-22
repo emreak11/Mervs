@@ -2,13 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-"""
+"""""
 Mervs_falsifiable.py
 -------------------
-Goal: Make the simulation falsifiable (non self-confirming) by:
-  - Removing direct morphology -> epsilon/tau mappings from the core experiment
-  - Introducing a controlled perturbation: neighbor rewiring rate (rho)
-  - Adding null switches:
+
         Null-1: fixed neighbors (rho = 0)
         Null-2: rewiring but global-random replacement (rho > 0, global)
         Alt:    rewiring with LOCAL replacement (rho > 0, local), mimicking local rearrangements
@@ -16,14 +13,14 @@ Goal: Make the simulation falsifiable (non self-confirming) by:
 
 Core scientific claim we can test:
   "Changing neighbor renewal statistics (rho) changes defect rate, even with fixed epsilon and tau."
-If this does not happen (or cannot be distinguished from nulls), the hypothesis is falsified in this model class.
-"""
+If this does not happen (or cannot be distinguished from nulls), the hypothesis is falsified in this model.
+"""""
 
 # -------------------------
 # 1) Tissue geometry and neighbor graph
 # -------------------------
 
-DEFECT_THRESHOLD = np.pi/3
+DEFECT_THRESHOLD = np.pi/3  
 threshold=DEFECT_THRESHOLD
 
 
@@ -33,7 +30,7 @@ def build_grid_positions(nx: int, ny: int, dx: float = 1.0, dy: float = 1.0) -> 
     X, Y = np.meshgrid(xs, ys, indexing="ij")
     return np.column_stack([X.ravel(), Y.ravel()])  # (N,2)
 
-def build_neighbor_graph_grid(nx: int, ny: int, mode: str = "von_neumann"):
+def build_neighbor_graph_grid(nx: int, ny: int, mode: str = "von_neumann"): #simple neighbour sim. (4 ways only, moore for diagonals)
     """Initial neighbor list for each node (directed list, but symmetric for grid)."""
     def idx(i, j): return i * ny + j
     N = nx * ny
@@ -524,6 +521,7 @@ if __name__ == "__main__":
 
 
      
+
 
 
 
