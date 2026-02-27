@@ -2,10 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-"""""
+"""
 Mervs_falsifiable.py
 -------------------
-
+Goal: Make the simulation falsifiable (non self-confirming) by:
+  - Removing direct morphology -> epsilon/tau mappings from the core experiment
+  - Introducing a controlled perturbation: neighbor rewiring rate (rho)
+  - Adding null switches:
         Null-1: fixed neighbors (rho = 0)
         Null-2: rewiring but global-random replacement (rho > 0, global)
         Alt:    rewiring with LOCAL replacement (rho > 0, local), mimicking local rearrangements
@@ -13,24 +16,24 @@ Mervs_falsifiable.py
 
 Core scientific claim we can test:
   "Changing neighbor renewal statistics (rho) changes defect rate, even with fixed epsilon and tau."
-If this does not happen (or cannot be distinguished from nulls), the hypothesis is falsified in this model.
-"""""
+If this does not happen (or cannot be distinguished from nulls), the hypothesis is falsified in this model class.
+"""
 
 # -------------------------
 # 1) Tissue geometry and neighbor graph
 # -------------------------
 
-DEFECT_THRESHOLD = np.pi/3  
+DEFECT_THRESHOLD = np.pi/3
 threshold=DEFECT_THRESHOLD
 
 
-def build_grid_positions(nx: int, ny: int, dx: float = 1.0, dy: float = 1.0) -> np.ndarray:
+def build_grid_positions(nx: int, ny: int, dx: float = 1.0, dy: float = 1.0) -> np.ndarray:  #3D modelleme aşırı ?
     xs = np.arange(nx) * dx
     ys = np.arange(ny) * dy
     X, Y = np.meshgrid(xs, ys, indexing="ij")
     return np.column_stack([X.ravel(), Y.ravel()])  # (N,2)
 
-def build_neighbor_graph_grid(nx: int, ny: int, mode: str = "von_neumann"): #simple neighbour sim. (4 ways only, moore for diagonals)
+def build_neighbor_graph_grid(nx: int, ny: int, mode: str = "von_neumann"):   #von_neumann 2D grid komşuluk, diagonaller için moore kullanılmalı.
     """Initial neighbor list for each node (directed list, but symmetric for grid)."""
     def idx(i, j): return i * ny + j
     N = nx * ny
@@ -68,15 +71,7 @@ def rewire_neighbors(
     mode: str,
     local_candidates: list[np.ndarray] | None = None,
 ):
-    """
-    Rewire neighbor graph in-place with rate rho.
-    - rho is probability per node per rewire event (per call).
-    - mode:
-        * "global": choose new neighbor uniformly from all nodes
-        * "local":  choose new neighbor from local_candidates[i]
-    Keeps degree ~ constant by replacing one neighbor with another.
-    Ensures symmetry by rewiring both directions (undirected-like).
-    """
+    
     if rho <= 0:
         return
 
@@ -123,7 +118,7 @@ def rewire_neighbors(
         nbrs[j_new].add(i)
 
 # -------------------------
-# 2) Delayed Kuramoto with dynamic neighbors (rewiring)
+# 2) Delayed Kuramoto with dynamic neighbors (rewiring) , paper: Kuramoto, Y. (1984). Chemical Oscillations, Waves, and Turbulence. SpringerVerlag.
 # -------------------------
 def simulate_delayed_kuramoto_dynamic(
     nbrs,               # list[set[int]] neighbor graph (can be rewired in place)
@@ -255,6 +250,7 @@ def run_rewiring_sweep(
       - null_global: rho>0 with global replacement
       - alt_local: rho>0 with local replacement
     """
+    # nulls are important to show that any rho effect is not just noise (keep in mind for futher models or sims)
     pos = build_grid_positions(nx, ny, dx=1.0, dy=1.0)
     N = nx * ny
 
@@ -521,7 +517,6 @@ if __name__ == "__main__":
 
 
      
-
 
 
 
